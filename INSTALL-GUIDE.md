@@ -126,8 +126,10 @@ When she's done she'll read the whole picture back to you. Check it. Then say ye
 
 ## Step 6 — Let her build
 
-She creates your folders, writes your files, and sets up two shortcuts. Watch the terminal — she
-narrates what she's doing. If she asks permission for something, read the request before saying yes.
+She creates your folders, writes your files, and sets up your Desktop shortcuts — the two Cloud
+ones now, the two Local ones too if you're doing Phase 2 in this same session. Watch the
+terminal — she narrates what she's doing. If she asks permission for something, read the request
+before saying yes.
 
 When she finishes she'll tell you to close the session and use the Desktop shortcut instead.
 

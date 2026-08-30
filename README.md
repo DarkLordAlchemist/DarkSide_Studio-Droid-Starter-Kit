@@ -5,17 +5,13 @@ you can type to her or talk to her out loud, and once she's set up she can run w
 connection.
 
 This repo is the **installer and the starting configuration**. It is deliberately small: three
-capabilities, two shortcuts, one interview.
+capabilities, four shortcuts, one interview.
 
 | Piece | What it is | Where it comes from |
 |---|---|---|
 | **Memory** | A folder of plain markdown files EVIE reads and writes. No database, no cloud. | Adapted from [ai-memory-vault](https://github.com/jaredrhod/ai-memory-vault) |
 | **Chat** | A typed terminal session with EVIE. | Claude Code |
 | **Talk** | Hold a key, speak, EVIE answers out loud in a local voice. | [backtalk](https://github.com/jaredrhod/backtalk) |
-
-Not included on purpose: the visualizer (face) and the webcam hands board. They are excellent and
-you can add them later, but they add hardware requirements and failure modes that get in the way of
-a first install.
 
 ---
 
@@ -71,7 +67,8 @@ claude "read SETUP.md and set me up"
 ```
 
 From there it is a conversation. EVIE interviews you, builds your memory vault, writes your
-guardrails, and leaves two shortcuts on your Desktop.
+guardrails, and leaves the Cloud shortcuts on your Desktop — the Local ones join them once you
+do Phase 2.
 
 **The long version, with screenshots-level detail and nothing assumed:**
 [INSTALL-GUIDE.md](INSTALL-GUIDE.md).
