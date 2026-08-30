@@ -1,0 +1,8 @@
+# Never commit a filled-in config or anything personal
+config/backtalk.json
+Vault/
+logs/
+*.log
+.claude/
+.DS_Store
+Thumbs.db

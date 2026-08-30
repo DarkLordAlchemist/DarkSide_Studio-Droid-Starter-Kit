@@ -1,0 +1,12 @@
+# Windows scripts MUST keep CRLF line endings.
+# A .bat file with Unix line endings can fail on GOTO and on multi-line blocks,
+# and the failure is silent and confusing. Do not remove these lines.
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+*.ps1   text eol=crlf
+
+# Everything else is normal text, normalised to LF in the repo.
+*.md    text eol=lf
+*.json  text eol=lf
+LICENSE text eol=lf
+NOTICE  text eol=lf
