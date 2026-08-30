@@ -13,10 +13,6 @@ capabilities, two shortcuts, one interview.
 | **Chat** | A typed terminal session with EVIE. | Claude Code |
 | **Talk** | Hold a key, speak, EVIE answers out loud in a local voice. | [backtalk](https://github.com/jaredrhod/backtalk) |
 
-Not included on purpose: the visualizer (face) and the webcam hands board. They are excellent and
-you can add them later, but they add hardware requirements and failure modes that get in the way of
-a first install.
-
 ---
 
 ## Who this is for
