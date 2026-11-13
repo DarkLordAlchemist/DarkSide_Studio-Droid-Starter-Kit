@@ -1,8 +1,13 @@
 # Never commit a filled-in config or anything personal
 config/backtalk.json
-Vault/
+# Anchored to the repo root on purpose: on Windows (case-insensitive) a bare
+# "Vault/" also matched templates/vault/ and silently dropped the vault templates.
+/Vault/
 logs/
 *.log
 .claude/
 .DS_Store
 Thumbs.db
+
+# Build artifact of docs/build-install-book.py (the PDF is kept)
+docs/EVIE-Install-Book.html

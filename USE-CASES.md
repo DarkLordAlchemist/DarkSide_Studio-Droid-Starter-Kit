@@ -9,7 +9,7 @@ impressive in a demo and disappoints in practice.
   ●●●●● works every time · ●●●○○ works with supervision · ●○○○○ demo-grade.
 - **Impact** — how much workload it actually removes. Weighted toward *recurring* time, because a
   thing that saves 20 minutes every week beats a thing that saves two hours once.
-- **Mode** — ☁ needs cloud (Claude), ⬛ works fine on the local model, ☁⬛ works in both with the
+- **Mode** — ☁ needs Paid (Claude), ⬛ works fine on the local model, ☁⬛ works in both with the
   local version being rougher.
 
 The ranking is roughly viability × impact, with a thumb on the scale for how soon a student sees the
@@ -105,7 +105,7 @@ This is the line the guardrails draw, and it's the right line — a student who 
 five drafts learns more than one who submits five generated essays and learns nothing. It's also the
 version that survives a plagiarism check and a viva.
 
-Cloud is meaningfully better here. Local-model critique tends toward generic advice.
+Paid is meaningfully better here. Local-model critique tends toward generic advice.
 
 ---
 
@@ -153,7 +153,7 @@ source — always, on both models.
 You solve it, she checks it, and — the important part — she shows where your reasoning diverged
 rather than just handing you the right number.
 
-Rated three dots deliberately. Language models make arithmetic and algebra errors, and the local 9B
+Rated three dots deliberately. Language models make arithmetic and algebra errors, and the local model
 makes more of them. Use her to *locate* your error, not to certify your answer. If she disagrees with
 you, that's a signal to look again, not proof you're wrong.
 
@@ -293,8 +293,8 @@ ask for it and it's a harmless way to build the daily habit.
   disciplinary meeting.
 - **Anything needing current information, on local mode.** No web access, fixed knowledge. She'll
   answer anyway. That's the danger.
-- **Long autonomous chains on the local model.** Six-plus tool calls on a 9B is where it drifts.
-  Split the task or switch to cloud.
+- **Long autonomous chains on the local model.** Six-plus tool calls on a local model is where it drifts.
+  Split the task or switch to Paid.
 - **Serious statistical analysis.** Use a real tool; have her help you drive it.
 - **Anything you'd be uncomfortable explaining to your teacher.** If you'd hide it, that's the answer.
 

@@ -20,17 +20,17 @@ if ($InFolder) {
 
 $shell = New-Object -ComObject WScript.Shell
 
-# Icon choice is cosmetic. Cloud shortcuts get the network globe, local ones get
+# Icon choice is cosmetic. Paid shortcuts get the network globe, local ones get
 # the computer, so the two are distinguishable at a glance without reading.
 $launchers = @(
-    @{ Name = 'EVIE - Chat (Cloud)'; File = 'EVIE-Chat-Cloud.bat'; Icon = 18
-       Desc = 'Type to EVIE on Claude. Needs internet. Use this for anything hard.' }
-    @{ Name = 'EVIE - Talk (Cloud)'; File = 'EVIE-Talk-Cloud.bat'; Icon = 18
+    @{ Name = 'EVIE - Chat (Paid)';  File = 'EVIE-Chat-Paid.bat';  Icon = 18
+       Desc = 'Type to EVIE on Claude (your subscription). Needs internet. Use this for anything hard.' }
+    @{ Name = 'EVIE - Talk (Paid)';  File = 'EVIE-Talk-Paid.bat';  Icon = 18
        Desc = 'Talk to EVIE on Claude. Hold the key, speak, let go.' }
     @{ Name = 'EVIE - Chat (Local)'; File = 'EVIE-Chat-Local.bat'; Icon = 15
-       Desc = 'Type to EVIE on your own machine. No internet needed.' }
+       Desc = 'Type to EVIE on gpt-oss-20b, on this machine. No internet, no sign-in.' }
     @{ Name = 'EVIE - Talk (Local)'; File = 'EVIE-Talk-Local.bat'; Icon = 15
-       Desc = 'Talk to EVIE fully offline. Everything runs on this laptop.' }
+       Desc = 'Talk to EVIE fully offline on gpt-oss-20b. Everything runs on this laptop.' }
 )
 
 foreach ($l in $launchers) {
@@ -49,4 +49,4 @@ foreach ($l in $launchers) {
 
 Write-Host ''
 Write-Host "Done. Four shortcuts in: $target"
-Write-Host 'Cloud = smarter, needs internet.  Local = offline, runs on this machine.'
+Write-Host 'Paid = smarter, needs internet and your subscription.  Local = offline gpt-oss, never asks you to sign in.'

@@ -90,9 +90,13 @@ Walk through these:
 24. **Should I keep EVIE's default voice, or do you want to hear a couple of options?**
     Default is Kokoro `af_heart` — warm, even, American English. Alternatives: `af_bella`,
     `af_nicole`, `bf_emma` (British), `am_michael`, `bm_lewis`.
-25. **How reliable is your internet?**
-    If the honest answer is "not very" or "not at school", flag `GOING-LOCAL.md` now — but still
-    finish the cloud install first. Do not switch them to a local model on day one.
+25. **How reliable is your internet, and do you want an offline brain too?**
+    Explain in two lines: the offline brain is gpt-oss-20b running on this PC. It works with no
+    internet and never needs the subscription or a sign-in, but it's slower and less capable than
+    Paid, and it's a ~12.5 GB download that needs about 16 GB of RAM (an NVIDIA card with 8 GB or more
+    makes it pleasant). Before you ask, tell them what their machine has (Phase 0 measured it).
+    If yes: install it now (SETUP Phase 6). If "later": that's fine, the Local shortcuts will say how
+    to add it. Either way, finish the Paid setup first.
 
 ---
 

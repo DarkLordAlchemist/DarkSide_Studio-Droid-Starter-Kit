@@ -1,21 +1,29 @@
 @echo off
 rem ============================================================================
-rem  EVIE - Chat (Local).  Type to EVIE, running on your own machine.
-rem  No internet needed. Slower and less capable than Cloud - see USE-CASES.md
-rem  for which tasks hold up here.
-rem  Close the window to end the session.
+rem  EVIE - Chat (Local).  Type to EVIE running on gpt-oss-20b, on THIS machine.
+rem  No internet, no subscription, no sign-in - ever.
+rem  Slower and less capable than Paid; see USE-CASES.md for what holds up.
+rem  Close the window to end the session. The minimised "EVIE local brain"
+rem  window is the model itself: leave it open while you work.
 rem ============================================================================
 setlocal
 title EVIE - Chat (Local)
 call "%~dp0evie-env.cmd" local
 
+if defined EVIE_LOCAL_MISSING (
+  echo.
+  echo   The local brain is not installed yet.
+  echo   Open EVIE - Chat ^(Paid^) and say:  "install my local brain"
+  echo   or run scripts\Install-LocalBrain.ps1 yourself.
+  echo.
+  pause & exit /b 1
+)
+
 cd /d "%EVIE_HOME%"
 if not exist "%EVIE_HOME%\CLAUDE.md" (
   echo.
-  echo   Cannot find CLAUDE.md in %EVIE_HOME%
-  echo   Setup did not finish, or the EVIE folder was moved or renamed.
-  echo   Fix: open PowerShell in %EVIE_REPO% and run:
-  echo        claude "read SETUP.md and set me up"
+  echo   Cannot find CLAUDE.md in %EVIE_HOME% - setup did not finish, or the
+  echo   EVIE folder was moved. Move it back, or rerun setup from Paid.
   echo.
   pause & exit /b 1
 )
@@ -24,62 +32,48 @@ where claude >nul 2>nul
 if errorlevel 1 (
   echo.
   echo   Claude Code is not installed, or Windows cannot find it.
-  echo   Fix: open PowerShell and run:   irm https://claude.ai/install.ps1 ^| iex
-  echo   Then close EVERY terminal window and try this shortcut again.
+  echo   Close EVERY terminal window and try again.
   echo.
   pause & exit /b 1
 )
 
-where ollama >nul 2>nul
+call "%~dp0start-local-brain.cmd"
 if errorlevel 1 (
   echo.
-  echo   Ollama is not installed, so there is no local brain to talk to.
-  echo   Use the Cloud shortcut instead, or set up local mode:
-  echo   open EVIE - Chat ^(Cloud^) and say "set me up for local mode".
-  echo.
+  echo   The local brain did not start - see the message above.
   pause & exit /b 1
-)
-
-curl -s -o nul -m 5 http://localhost:11434/api/version
-if errorlevel 1 (
-  echo.
-  echo   Ollama is installed but not responding on port 11434.
-  echo   Fix: start Ollama from the Start menu, wait ten seconds, try again.
-  echo.
-  pause & exit /b 1
-)
-
-if "%EVIE_CTX%"=="" (
-  echo.
-  echo   WARNING: OLLAMA_CONTEXT_LENGTH is not set.
-  echo   EVIE will lose track of what she is doing partway through tasks.
-  echo   Fix: right-click scripts\Set-OllamaTuning.ps1 and choose
-  echo        "Run with PowerShell". It takes about a minute.
-  echo.
-  echo   Continuing anyway in 10 seconds. Ctrl+C to stop.
-  timeout /t 10 >nul
-  set "EVIE_CTX=(not set)"
 )
 
 echo.
 echo   ==========================================
 echo     EVIE - Chat        [ LOCAL ]
 echo   ==========================================
-echo     Brain:    %EVIE_BRAIN_LABEL%
-echo     Context:  %EVIE_CTX% tokens
-echo     Vault:    %EVIE_VAULT%
+echo     Brain:  %EVIE_BRAIN_LABEL%
+echo     Vault:  %EVIE_VAULT%
 echo.
-echo     No internet needed. She cannot search the web or look up
-echo     anything recent in this mode.
+echo     Offline. She cannot search the web or know recent events here.
 echo.
 
-claude
+rem Why this exact command line - every flag is a fix for a real failure:
+rem  --tools <list>    Name the tools explicitly. Leaving --tools out gave a
+rem                    session with ZERO usable tools; --tools default skips
+rem                    anything from MCP. WebSearch is left out on purpose: it
+rem                    is an Anthropic server feature and cannot work offline.
+rem  --strict-mcp-config  No MCP servers or connectors at all. gpt-oss's chat
+rem                    template crashes (HTTP 500, "param_spec.type") on the
+rem                    deeply nested schemas some connectors send.
+rem  --permission-mode bypassPermissions  With approval prompts on, a local
+rem                    model that is silently waiting on one invents a fake
+rem                    reason ("system policy") instead of saying so. The
+rem                    guardrails in CLAUDE.md plus the delete-protection hook
+rem                    in .claude\settings.json hold the line instead.
+claude --model %EVIE_LLM_ALIAS% --tools Read,Write,Edit,Bash,Glob,Grep,WebFetch,TodoWrite --strict-mcp-config --permission-mode bypassPermissions %*
 set "RC=%ERRORLEVEL%"
 if not "%RC%"=="0" (
   echo.
   echo   EVIE exited with code %RC%.
-  echo   If local mode keeps failing, try the same task in Cloud - that tells
-  echo   you instantly whether it is the model or the setup.
+  echo   If local keeps failing, try the same task in Paid - that tells you
+  echo   instantly whether it is the model or the setup.
   echo.
   pause
 )

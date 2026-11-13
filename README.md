@@ -1,149 +1,95 @@
 # EVIE — a companion agent that lives on your machine
 
 EVIE is an AI companion you install on your own Windows PC. She remembers you between sessions,
-you can type to her or talk to her out loud, and once she's set up she can run without an internet
-connection.
+you can type to her or talk to her out loud, and she can run fully offline on a model on your own
+machine, with no subscription and no sign-in.
 
-This repo is the **installer and the starting configuration**. It is deliberately small: three
-capabilities, four shortcuts, one interview.
-
-| Piece | What it is | Where it comes from |
-|---|---|---|
-| **Memory** | A folder of plain markdown files EVIE reads and writes. No database, no cloud. | Adapted from [ai-memory-vault](https://github.com/jaredrhod/ai-memory-vault) |
-| **Chat** | A typed terminal session with EVIE. | Claude Code |
-| **Talk** | Hold a key, speak, EVIE answers out loud in a local voice. | [backtalk](https://github.com/jaredrhod/backtalk) |
-
----
-
-## Who this is for
-
-- **Students** who want a study partner that works offline, keeps their notes, and does the tedious
-  parts of coursework without doing the thinking for them.
-- **Small business owners and teams** who want an assistant that knows their business, drafts their
-  documents, and never touches customer data it shouldn't.
-
-Everything in here is written so a person who has never opened a terminal can finish the install.
-If you are technical, skip to [SETUP.md](SETUP.md) and let your agent run it.
+| Piece | What it is |
+|---|---|
+| **The agent** | [Claude Code](https://code.claude.com): the harness that gives EVIE hands (files, tools, commands). |
+| **Memory** | A folder of plain markdown files run as an **LLM wiki**, after Andrej Karpathy's pattern: sources in `raw/`, a catalog in `index.md`, a timeline in `log.md`, and regular health checks. No database, no cloud. |
+| **Paid brain** | Claude, through your subscription. The best experience. Needs internet. |
+| **Local brain** | **gpt-oss-20b** on **llama.cpp**, on your own PC. Offline, free per use, **never asks you to sign in**, tool calling included. |
+| **Talk** | Hold a key, speak, EVIE answers out loud ([backtalk](https://github.com/jaredrhod/backtalk), downloaded at setup). |
 
 ---
 
-## Two phases
+## Install — one line
 
-**Phase 1 — Cloud brain.** EVIE runs on Claude Code with a Claude subscription. Fastest path to a
-working agent and the best experience. Needs internet.
-
-**Phase 2 — Local brain.** EVIE runs on a model installed on your own machine through Ollama.
-Slower and less capable, but free per-use, private, and works with no internet at all. See
-[GOING-LOCAL.md](GOING-LOCAL.md).
-
-Do Phase 1 first, always. After Phase 2 you have **four Desktop shortcuts** and pick a brain by
-picking an icon — same EVIE, same memory, same vault behind all of them.
-
----
-
-## Install
-
-**Requirements**
-
-- Windows 11 (Windows 10 1809+ also works). Native Windows — no WSL needed.
-- A Claude Pro, Max, Team, or Enterprise account (~$20/month). The free plan does not include
-  Claude Code.
-- About 5 GB free disk for Phase 1, plus ~10 GB more if you do Phase 2.
-- A microphone, if you want Talk.
-
-**The short version**, in PowerShell:
+Open **Windows PowerShell** (not as Administrator) and paste:
 
 ```powershell
-irm https://claude.ai/install.ps1 | iex
+irm https://raw.githubusercontent.com/DarkLordAlchemist/DarkSide_Studio-Droid-Starter-Kit/main/install.ps1 | iex
 ```
 
-Close PowerShell, open a new one, then:
+That installs Claude Code, Git and uv if they're missing, downloads this kit to
+`%USERPROFILE%\EVIE\droid-kit`, and starts the setup conversation. EVIE interviews you, builds her
+memory, sets up voice and, if you want it, the offline gpt-oss brain, then leaves four shortcuts on
+your Desktop.
 
-```powershell
-mkdir $HOME\EVIE; cd $HOME\EVIE
-git clone https://github.com/DarkLordAlchemist/DarkSide_Studio-Droid-Starter-Kit.git droid-kit
-cd droid-kit
-claude "read SETUP.md and set me up"
-```
+**You need a Claude subscription (Pro or higher) for this first install,** because the setup interview
+runs on it. After that, the Local shortcuts work with no subscription at all.
 
-From there it is a conversation. EVIE interviews you, builds your memory vault, writes your
-guardrails, and leaves the Cloud shortcuts on your Desktop — the Local ones join them once you
-do Phase 2.
-
-**The long version, with screenshots-level detail and nothing assumed:**
-[INSTALL-GUIDE.md](INSTALL-GUIDE.md).
+Full walkthrough, nothing assumed: **[INSTALL-GUIDE.md](INSTALL-GUIDE.md)** (also in the PDF install book).
 
 ---
 
-## After setup
+## After setup: four shortcuts
 
-Shortcuts land on your Desktop. Two after Phase 1, four once you've done Phase 2:
+| Shortcut | Brain | Internet | Sign-in | Use it for |
+|---|---|---|---|---|
+| **EVIE - Chat (Paid)** | Claude | Required | Subscription | Anything hard, long, or that you'll rely on |
+| **EVIE - Talk (Paid)** | Claude | Required | Subscription | Quizzing, rehearsal, thinking out loud |
+| **EVIE - Chat (Local)** | gpt-oss-20b | None | **Never** | Offline hours, notes, filing, routine work |
+| **EVIE - Talk (Local)** | gpt-oss-20b | None | **Never** | Fully offline voice: nothing leaves the PC |
 
-| Shortcut | Brain | Internet | Use it for |
-|---|---|---|---|
-| **EVIE — Chat (Cloud)** | Claude | Required | Anything hard, long, or that you'll rely on |
-| **EVIE — Talk (Cloud)** | Claude | Required | Quizzing, rehearsal, thinking out loud |
-| **EVIE — Chat (Local)** | Your machine | None | Offline hours, notes, filing, routine work |
-| **EVIE — Talk (Local)** | Your machine | None | Fully offline voice — nothing leaves the laptop |
+Pick a brain by picking an icon. Paid and Local windows can be open at the same time and can't
+interfere with each other. The memory is shared.
 
-Each opens a terminal window. That window *is* EVIE — closing it ends the session. Cloud and Local
-windows can be open at the same time and cannot interfere with each other.
-
-**When something breaks, tell EVIE.** Open Chat and describe what went wrong in plain words. She
-can read [TROUBLESHOOTING.md](TROUBLESHOOTING.md) and fix most of it herself. This is the part
-people discover late: you are not expected to debug this.
+**When something breaks, tell EVIE.** Open Chat and describe it. She reads
+[TROUBLESHOOTING.md](TROUBLESHOOTING.md), which covers every failure found while building this, and
+fixes most things herself.
 
 ---
 
 ## Repository contents
 
 ```
-droid-kit/                (whatever you named the cloned folder)
-├── SETUP.md              The install wizard. Your agent reads this and runs the install.
-├── INSTALL-GUIDE.md      The human step-by-step. No coding background assumed.
-├── GOING-LOCAL.md        Phase 2: switching EVIE to a local model with Ollama.
-├── TROUBLESHOOTING.md    Known problems and their fixes, written for EVIE to read.
-├── USE-CASES.md          Ranked use cases for students, plus a business section.
-├── HARDWARE.md           What each laptop tier can actually run.
-├── CREDITS.md            Attribution and the licensing reasoning. Read before forking.
-├── LICENSE               Apache 2.0.
-├── NOTICE                Required attribution file.
-├── interview/
-│   └── INTERVIEW.md      The questions EVIE asks during setup, in order.
-├── templates/
-│   ├── CLAUDE.md         EVIE's identity and her non-negotiables. The most important file.
-│   ├── GUARDRAILS.md     The safety rules, in one place, in plain language.
-│   ├── VAULT-INDEX.md    The vault's operating manual.
-│   ├── PROFILE.md        Who you are — EVIE keeps this current.
-│   └── DAILY-NOTE.md     The shape of every daily note.
+droid-kit/
+├── install.ps1            The one-line installer.
+├── SETUP.md               The install wizard EVIE follows.
+├── INSTALL-GUIDE.md       The human step-by-step (source of the PDF install book).
+├── GOING-LOCAL.md         The offline gpt-oss brain: how it works, what to expect.
+├── TROUBLESHOOTING.md     Every known problem and its fix, written for EVIE to read.
+├── USE-CASES.md           Ranked use cases for students, plus a business section.
+├── HARDWARE.md            What each laptop tier can run.
+├── CREDITS.md / LICENSE / NOTICE
+├── docs/                  EVIE-Install-Book.pdf (the install book), WHATS-BAKED-IN.md
+│                          (every past problem → its fix), build-install-book.py
+├── interview/INTERVIEW.md The questions EVIE asks during setup.
+├── templates/             CLAUDE.md, GUARDRAILS, VAULT-INDEX (the wiki rules), PROFILE,
+│                          DAILY-NOTE, vault/ (index, log, raw, outputs), claude/ (the wiki skill)
 ├── scripts/
-│   ├── EVIE-Chat-Cloud.bat    Typed session on Claude.
-│   ├── EVIE-Chat-Local.bat    Typed session on your own machine.
-│   ├── EVIE-Talk-Cloud.bat    Voice on Claude.
-│   ├── EVIE-Talk-Local.bat    Voice, fully offline.
-│   ├── evie-env.cmd           Shared environment. Takes cloud or local as an argument.
-│   ├── Set-OllamaTuning.ps1   Measures your hardware, sets the largest workable
-│   │                          context window permanently, proves it worked.
-│   └── Make-Shortcuts.ps1     Puts the four shortcuts on the Desktop.
-└── config/
-    └── backtalk.json.example  Voice settings. Ships with EVIE's default voice.
+│   ├── EVIE-Chat-Paid.bat / EVIE-Talk-Paid.bat
+│   ├── EVIE-Chat-Local.bat / EVIE-Talk-Local.bat
+│   ├── evie-env.cmd            Per-window environment: paid or local (sealed profile).
+│   ├── start-local-brain.cmd   Starts gpt-oss on llama.cpp if it isn't running.
+│   ├── Install-LocalBrain.ps1  Downloads, fits, and PROVES the local brain.
+│   ├── Setup-EvieHome.ps1      Builds EVIE's folder, vault, hooks, shortcuts. Never overwrites.
+│   ├── Set-BacktalkModel.ps1   Points the voice at the right brain on every start.
+│   ├── talk-preflight.cmd      Voice checks (one voice window at a time).
+│   ├── Make-Shortcuts.ps1      The four Desktop shortcuts.
+│   ├── wiki-lint.py            Read-only vault health check.
+│   └── hooks/                  Delete protection + compaction sweep (PowerShell).
+└── config/backtalk.json.example
 ```
 
 ---
 
 ## Credits and license
 
-**Apache 2.0.** Use it, teach with it, fork it, build a business on it. Keep `LICENSE` and `NOTICE`
-with it and you've met every obligation.
-
-The design owes a real debt to [Jared Rhodenizer's](https://jaredrhod.com) work — `ai-memory-vault`
-showed that an AI's memory can be a folder of markdown files instead of a database, and `backtalk`
-is the voice engine this module installs. Neither is included here: the ideas are shared, the code
-and text are not, and `backtalk` is downloaded from its own repository at setup so its AGPL terms
-stay where they belong.
-
-Local model: [Ornith 1.5 9B](https://ollama.com/library/ornith-1.5) (MIT). Voice:
-[Kokoro](https://github.com/hexgrad/kokoro) (Apache 2.0). Hearing:
-[faster-whisper](https://github.com/SYSTRAN/faster-whisper) (MIT).
-
-Full reasoning, and the two rules that keep this license valid, in [CREDITS.md](CREDITS.md).
+**Apache 2.0.** Keep `LICENSE` and `NOTICE` with it and you've met every obligation. Ideas from
+[Jared Rhodenizer](https://jaredrhod.com) (file-based memory, backtalk) and
+[Andrej Karpathy](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) (the LLM wiki
+pattern). No one else's code or text is included. Local model: gpt-oss-20b (Apache-2.0) on llama.cpp
+(MIT). Full reasoning in [CREDITS.md](CREDITS.md).

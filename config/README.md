@@ -1,34 +1,29 @@
 # config/
 
-**There is no mode switch file any more.** Which brain EVIE uses is decided by which shortcut you
-double-click. `scripts\evie-env.cmd` takes `cloud` or `local` as an argument, and each launcher
-passes its own. That means a Cloud window and a Local window can be open side by side and neither
-can affect the other.
+**There is no mode switch file.** Which brain EVIE uses is decided by which shortcut you
+double-click. `scripts\evie-env.cmd` takes `paid` or `local`, each launcher passes its own, and
+everything it sets lives only in that one window. That's why a Paid window and a Local window can
+be open side by side without affecting each other.
 
 ---
 
-**backtalk.json.example** — the voice settings. During setup this gets copied to
-`..\..\backtalk\backtalk.json` with real paths filled in.
+**backtalk.json.example**: the voice settings. Setup copies it to `..\..\backtalk\backtalk.json`.
 
 | Key | What it does |
 |---|---|
-| `agent_dir` | The folder holding EVIE's `CLAUDE.md`. This is what makes the voice *EVIE* rather than a generic assistant. Absolute Windows path, doubled backslashes. |
+| `agent_dir` | The folder holding EVIE's `CLAUDE.md`. This is what makes the voice *EVIE*. **Written by the Talk launchers on every start**, so you don't have to set it. |
+| `model`, `deep_model` | Which brain the voice uses. **Also written by the Talk launchers on every start** (Claude for Paid, gpt-oss for Local). A stale value left here once made the voice go silent with no error, which is why the launchers rewrite it. |
 | `name` | What she's called on screen. |
-| `ptt_key` | Push-to-talk key. `home` by default because nothing else uses it. `insert` and `scroll_lock` also work. Avoid anything you type with. |
-| `voice` | Kokoro voice ID. Ships as `af_heart` — "Heart", American English, warm and even. First letter is the language: `a` American, `b` British. Around 60 voices ship free. |
-| `stt_model` | Whisper model for hearing you. `small.en` is the sweet spot on a laptop. `base.en` is faster and worse, `medium.en` slower and better. |
-
-**Other voices worth trying:** `af_bella` (brighter), `af_nicole` (softer), `bf_emma` (British),
-`am_michael` / `bm_lewis` (male).
+| `ptt_key` | Push-to-talk key. `home` by default. `insert` and `scroll_lock` also work. Avoid any key you type with. |
+| `voice` | Kokoro voice ID. `af_heart` = warm American English. Also `af_bella`, `af_nicole`, `bf_emma` (British), `am_michael`, `bm_lewis`. |
+| `stt_model` | Whisper model for hearing you. `small.en` is the sweet spot on a laptop. |
+| `permission_mode` | `ask` (she asks out loud before acting) or `bypassPermissions` (she acts without asking, and the guardrails hold the line). |
+| `extra_dirs` | Other folders the voice may work in besides `agent_dir`. |
 
 ---
 
-## Ollama settings are not in this folder
+## The local brain's settings are not in this folder
 
-They can't be. Ollama runs as a background Windows service and reads its configuration when *it*
-starts, not when a terminal or a batch file starts — so `OLLAMA_CONTEXT_LENGTH` has to live in your
-Windows user environment variables.
-
-`scripts\Set-OllamaTuning.ps1` measures your machine, picks the largest context window it can
-sustain, writes all of it, restarts Ollama, and then times a real answer to prove it worked. Run
-that instead of setting anything by hand.
+They live in `EVIE\local\brain.cmd`, written by `scripts\Install-LocalBrain.ps1` for **this**
+machine's hardware: context size, how much of gpt-oss sits in RAM vs VRAM, the port. Re-run that
+script if the hardware changes, rather than editing the file by hand.

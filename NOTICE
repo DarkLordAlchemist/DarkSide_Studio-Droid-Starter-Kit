@@ -11,6 +11,11 @@ projects, which it interoperates with but does not include:
         Source of the file-based-memory approach this module implements
         independently. No text or files from that project are distributed here.
 
+  - The "LLM wiki" pattern described by Andrej Karpathy
+        https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f
+        Source of the raw / wiki / index / log / lint memory design. No text
+        from that note is distributed here.
+
   - backtalk by Jared Rhodenizer (AGPL-3.0-or-later)
         https://github.com/jaredrhod/backtalk
         Downloaded from its own repository during setup. Not redistributed here
@@ -19,8 +24,8 @@ projects, which it interoperates with but does not include:
 Third-party software installed at setup time, under its own license:
 
   - Claude Code (Anthropic) — proprietary, requires a subscription
-  - Ollama — MIT
-  - Ornith 1.5 9B (DeepReinforce) — MIT
+  - llama.cpp (ggml-org) — MIT
+  - gpt-oss-20b (OpenAI) — Apache-2.0
   - Kokoro (hexgrad) — Apache-2.0
   - faster-whisper (SYSTRAN) / Whisper (OpenAI) — MIT
   - espeak-ng — GPL-3.0, used as an external system tool

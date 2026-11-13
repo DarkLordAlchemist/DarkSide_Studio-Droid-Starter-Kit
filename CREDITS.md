@@ -17,6 +17,11 @@ specifically [ai-memory-vault](https://github.com/jaredrhod/ai-memory-vault), wh
 an AI's long-term memory can be a folder of plain markdown files rather than a vector database, and
 [backtalk](https://github.com/jaredrhod/backtalk), which is the voice loop this module installs.
 
+The memory is run as an **LLM wiki**: raw sources an AI never edits, a wiki it maintains, a catalog,
+an append-only log, and periodic lint passes. That pattern comes from
+[Andrej Karpathy's LLM-wiki note](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
+As with Jared's work, the idea is used and the words are original. Nothing from that note is copied here.
+
 Two things are worth being precise about, because they are different in kind:
 
 **Ideas are not owned.** A boot-config file that carries an agent's identity, a vault of notes with
@@ -71,10 +76,10 @@ by the user, onto their own machine.
 
 | Component | License | Note |
 |---|---|---|
-| Claude Code | Proprietary (Anthropic) | Requires a paid subscription. Cloud mode only. |
+| Claude Code | Proprietary (Anthropic) | Runs both lanes. The subscription is needed for the Paid lane and the first install. |
 | backtalk | AGPL-3.0-or-later | Cloned unmodified from its own repository. |
-| Ollama | MIT | Local inference server. |
-| Ornith 1.5 9B | MIT | The local model. |
+| llama.cpp | MIT | Local inference server (build b11871, downloaded from ggml-org's GitHub releases). |
+| gpt-oss-20b (OpenAI, GGUF by ggml-org) | Apache-2.0 | The local model. |
 | Kokoro | Apache-2.0 | Text to speech. Runs locally. |
 | faster-whisper / Whisper | MIT | Speech to text. Runs locally. |
 | espeak-ng | GPL-3.0 | Used as an external command-line tool, not linked. |

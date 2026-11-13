@@ -1,12 +1,14 @@
 @echo off
 rem ============================================================================
-rem  EVIE - Chat (Cloud).  Type to EVIE, running on Claude. Needs internet.
-rem  This is the one to use for anything hard, long, or that you'll rely on.
+rem  EVIE - Chat (Paid).  Type to EVIE on Claude, through your subscription.
+rem  Needs internet. Use it for anything hard, long, or that you'll rely on.
+rem  If your subscription ever lapses, THIS is the only window that will ask
+rem  you to sign in - the Local windows never do.
 rem  Close the window to end the session.
 rem ============================================================================
 setlocal
-title EVIE - Chat (Cloud)
-call "%~dp0evie-env.cmd" cloud
+title EVIE - Chat (Paid)
+call "%~dp0evie-env.cmd" paid
 
 cd /d "%EVIE_HOME%"
 if not exist "%EVIE_HOME%\CLAUDE.md" (
@@ -23,27 +25,28 @@ where claude >nul 2>nul
 if errorlevel 1 (
   echo.
   echo   Claude Code is not installed, or Windows cannot find it.
-  echo   Fix: open PowerShell and run:   irm https://claude.ai/install.ps1 ^| iex
-  echo   Then close EVERY terminal window and try this shortcut again.
+  echo   Fix: run the one-line installer again ^(INSTALL-GUIDE, Step 1^),
+  echo   then close EVERY terminal window and try this shortcut again.
   echo.
   pause & exit /b 1
 )
 
 echo.
 echo   ==========================================
-echo     EVIE - Chat        [ CLOUD ]
+echo     EVIE - Chat        [ PAID ]
 echo   ==========================================
 echo     Brain:  %EVIE_BRAIN_LABEL%
 echo     Vault:  %EVIE_VAULT%
 echo.
 
-claude
+claude %*
 set "RC=%ERRORLEVEL%"
 if not "%RC%"=="0" (
   echo.
   echo   EVIE exited with code %RC%.
-  echo   If that was unexpected, reopen this window and describe what happened -
-  echo   she can read TROUBLESHOOTING.md and fix most things herself.
+  echo   "OAuth session expired" or a login loop means the subscription sign-in
+  echo   lapsed: reopen this window and type  /login
+  echo   Anything else: reopen and describe it - she reads TROUBLESHOOTING.md.
   echo.
   pause
 )

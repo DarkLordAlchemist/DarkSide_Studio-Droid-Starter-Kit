@@ -3,5 +3,9 @@
   "name": "EVIE",
   "ptt_key": "home",
   "voice": "af_heart",
-  "stt_model": "small.en"
+  "stt_model": "small.en",
+  "permission_mode": "ask",
+  "extra_dirs": [],
+  "model": "claude-sonnet-5",
+  "deep_model": "claude-opus-5"
 }

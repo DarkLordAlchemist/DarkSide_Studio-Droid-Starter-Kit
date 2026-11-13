@@ -1,218 +1,129 @@
-# Going local — running EVIE with no internet
+# Going local — EVIE on gpt-oss-20b, with no internet
 
-This is Phase 2. Do it only after Phase 1 works and you've used EVIE for at least a few days.
-
-The point of local mode is **availability, not capability**. EVIE on a local model is slower and
-noticeably less capable than EVIE on Claude. What she gains is: no internet needed, no usage limits,
-no per-use cost, and nothing leaving the machine. For a student on unreliable campus wifi, or a
-business with data that can't go out, that trade is often worth it.
+The point of the Local lane is **availability, not capability**. EVIE on gpt-oss-20b is slower and
+less capable than EVIE on Claude. What you gain: no internet, no usage limits, no per-use cost,
+nothing leaving the machine, and **no subscription or sign-in, ever**. It keeps working the day a
+subscription lapses.
 
 ---
 
-## What makes this simple now
-
-Since v0.14.0, **Ollama speaks the Anthropic Messages API natively** at `/v1/messages`. That means
-Claude Code can point straight at Ollama with two environment variables. No LiteLLM, no translation
-proxy, no router. If you've read older guides that insist on a proxy layer, they predate this.
+## How it fits together
 
 ```
-EVIE — Chat (Local).bat
-     │  sets ANTHROPIC_BASE_URL=http://localhost:11434, in this window only
-     ▼
-Claude Code (the harness: tools, files, permissions, your CLAUDE.md)
-     │  Anthropic Messages API
-     ▼
-Ollama on your machine  →  ornith-1.5:9b
+EVIE - Chat (Local).bat
+   │  evie-env.cmd local  (this window only)
+   │    CLAUDE_CONFIG_DIR = EVIE\local\claude-profile   <- a profile that has never been signed in
+   │    ANTHROPIC_BASE_URL = http://127.0.0.1:8085      <- the local brain
+   │    ANTHROPIC_AUTH_TOKEN = local-no-login           <- so Claude Code never asks you to log in
+   ▼
+Claude Code  (tools, files, hooks, your CLAUDE.md and vault: identical to Paid)
+   │  Anthropic Messages API  (/v1/messages)
+   ▼
+llama.cpp llama-server (build b11871)  →  gpt-oss-20b (MXFP4, 12.1 GB)
 ```
 
-Everything else stays identical. Same vault, same guardrails, same shortcuts, same EVIE. Only the
-brain changes.
+**Why llama.cpp and gpt-oss.** llama.cpp's server speaks Claude Code's own API directly, so there's
+no translator in between. It runs gpt-oss's own chat template (`--jinja`), which is what makes
+**tool calling** work. And `--n-cpu-moe` lets a 20B "mixture of experts" model run on an 8 GB card by
+keeping some of its experts in RAM. gpt-oss-20b is Apache-2.0 and built for tool use.
+
+Same vault, same guardrails, same EVIE. Only the brain changes.
 
 ---
 
-## Step 1 — Install Ollama
+## Install it (one script)
 
-Download from [ollama.com](https://ollama.com/download) and run the installer. It installs itself as
-a background service and starts automatically. Nothing to configure yet.
-
-Check it:
+From EVIE - Chat (Paid), say **"install my local brain"**, or run it yourself in its own window:
 
 ```powershell
-ollama --version
+powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\EVIE\droid-kit\scripts\Install-LocalBrain.ps1"
 ```
 
----
+About 12.5 GB of downloads (it resumes if the connection drops), then roughly five minutes of checks.
+It runs these steps and **proves** each one:
 
-## Step 2 — Pull the model
-
-```powershell
-ollama pull ornith-1.5:9b
-```
-
-6.6 GB. On a slow connection this is a "start it and go do something else" step.
-
-**Why this model.** Ornith 1.5 9B is a dense 9B model built for agentic and tool-calling work — which
-is exactly what EVIE does all day. It's the smallest of the Ornith 1.5 family and the only one that
-fits an 8 GB card. The Ollama tag ships a Q4_K_M build with a 256K context window and vision.
-
-**Other models that work.** Anything in Ollama's library with a `tools` tag. If you have more VRAM,
-`ornith-1.5:35b` (23 GB) is a real step up. If you have less, or no GPU at all, a 4B-class model will
-run but will struggle with multi-step tool use — expect it to lose the thread.
-
-Test it on its own before involving EVIE:
-
-```powershell
-ollama run ornith-1.5:9b "Say hello in one sentence."
-```
-
-If that's slow or fails, fix it here. Don't move on and blame EVIE for it.
-
----
-
-## Step 3 — Tune it to your hardware (one script, don't skip it)
-
-Right-click `scripts\Set-OllamaTuning.ps1` and choose **Run with PowerShell**. About a minute.
-
-It reads your actual VRAM and RAM, picks the largest context window your machine can sustain, writes
-every relevant setting permanently, restarts Ollama, and then times a real answer to prove the
-settings took. It prints what it chose and why.
-
-**Why a script instead of instructions.** `OLLAMA_CONTEXT_LENGTH` cannot be set from a terminal or a
-batch file. Ollama runs as a background Windows service and reads its configuration when *it* starts.
-Set it anywhere else and it looks like it worked while doing nothing — which shows up weeks later as
-EVIE forgetting what she was doing, and gets blamed on the model.
-
-**What it sets:**
-
-| Setting | Why |
+| Step | What it proves |
 |---|---|
-| `OLLAMA_CONTEXT_LENGTH` | The big one. How much EVIE can hold at once. Sized to your VRAM. |
-| `OLLAMA_KV_CACHE_TYPE=q8_0` | Halves the memory the context cache uses, for a quality difference nobody notices. |
-| `OLLAMA_NUM_PARALLEL=1` | **Matters more than it looks.** Each concurrent slot gets its own context cache, so leaving this at the default can multiply your VRAM use and quietly undo the context setting. |
-| `OLLAMA_MAX_LOADED_MODELS=1` | One student, one model. Don't hold two in VRAM. |
-| `OLLAMA_KEEP_ALIVE=15m` | Stay warm between questions, release VRAM eventually. |
+| 1. Measures the PC | GPU, VRAM, driver, RAM, disk: decides everything below |
+| 2. llama.cpp b11871 | The exact build this kit was tested on, in the right flavour: CUDA 13 (NVIDIA driver 580+), CUDA 12 (older NVIDIA), Vulkan (AMD/Intel), or CPU |
+| 3. gpt-oss-20b | Downloaded, then checked byte for byte (12,109,566,624 bytes) |
+| 4. Fit | **Loads the model for real** at the planned context and GPU/RAM split. If it doesn't fit, or leaves under 500 MB of VRAM, it backs off and tries again |
+| 5. Speed | Times a real answer, in tokens/sec |
+| 6. Tool calling | Asks gpt-oss a question that needs a tool, and checks it calls the tool correctly |
+| 7. No sign-in | Seeds the sealed Local profile, then has **Claude Code** run a real Bash tool through gpt-oss with no login |
+| 8. Saves | `EVIE\local\brain.cmd`, which both Local shortcuts read |
 
-**What it picks**, before the RAM check trims it:
+The result is written to `EVIE\local\install-status.json`, which EVIE reads.
 
-| VRAM | Context |
-|---|---|
-| 24 GB+ | 262,144 (the model's maximum) |
-| 16 GB | 131,072 |
-| 12 GB | 65,536 |
-| 10 GB | 49,152 |
-| 8 GB | 32,768 |
-| 6 GB | 16,384 |
-| under 6 GB, or no GPU | 8,192 |
+**Starting points it uses** (only the 8 GB row was measured; the load test corrects the others on
+your machine):
 
-Then it caps: under 16 GB of system RAM it won't go past 16,384, and under 32 GB not past 65,536.
-Anything that doesn't fit in VRAM spills into RAM, so RAM is a real second ceiling.
+| VRAM | Context | Experts kept in RAM (`--n-cpu-moe`) |
+|---|---|---|
+| 20 GB+ | 131,072 | 0 |
+| 16 GB | 131,072 | 3 |
+| 12 GB | 131,072 | 10 |
+| 10 GB | 131,072 | 14 |
+| **8 GB (measured: RTX 5070 Laptop, ~22 tok/s, 1.2 GB VRAM spare)** | **131,072** | **18** |
+| 6 GB | 65,536 | 22 |
+| No GPU | 32,768 | all (CPU only, slow) |
 
-**Override it** if you know better:
-
-```powershell
-.\Set-OllamaTuning.ps1 -Context 65536
-```
-
-**8 GB VRAM, honestly.** `ornith-1.5:9b` is 5.6 GB of weights plus a 0.9 GB vision projector. On an
-8 GB card, that plus a 32K context does not all fit, so some layers run from system RAM and
-generation slows. It works. The script will tell you exactly how fast, in tokens per second, instead
-of leaving you to guess. Under 12 tokens/sec, treat local mode as a place for short jobs.
+The context memory lives on the graphics card, so system RAM doesn't limit context. RAM holds the
+experts that don't fit on the card, which is why 16 GB is the floor.
 
 ---
 
-## Step 4 — Use the Local shortcuts
+## Use it
 
-Nothing to configure. Run `scripts\Make-Shortcuts.ps1` if you haven't since installing, and the two
-Local icons appear alongside the two Cloud ones.
+Double-click **EVIE - Chat (Local)**. It starts the brain in a minimised window called
+*EVIE local brain* (leave that open; it **is** the model), then opens EVIE. The first load takes a
+minute or two. The GPU holds one model at a time, so the launcher stops any other llama-server first.
 
-Double-click **EVIE — Chat (Local)**. The header should read:
+**Paid and Local can be open at the same time.** Each launcher sets its own environment inside its
+own window. The vault is shared, so work done in one is there in the other.
 
-```
-  ==========================================
-    EVIE - Chat        [ LOCAL ]
-  ==========================================
-    Brain:    ornith-1.5:9b (local, via Ollama)
-    Context:  32768 tokens
-```
-
-If it says the context isn't set, the tuning script hasn't run. Run it.
-
-**Cloud and Local can be open at the same time.** Each launcher sets its own environment inside its
-own window and nothing leaks between them, so you can leave a Cloud session open for the hard thing
-and use Local for everything else. The vault is shared, so both see the same memory — work you do in
-one is available in the other.
-
-That isolation is deliberate. A permanent `ANTHROPIC_BASE_URL` pointing at Ollama would make your
-Cloud sessions silently talk to the local model, and the only symptom would be EVIE seeming to get
-worse for no reason. Nothing in this repo ever sets that permanently.
+**What the Local lane can use:** Read, Write, Edit, Bash, Glob, Grep, WebFetch and TodoWrite.
+**No WebSearch** (it's an Anthropic server feature) and **no MCP servers or connectors**
+(gpt-oss's template crashes on some of their schemas). Both are deliberate, not missing.
 
 ---
 
-## Step 5 — Test it honestly
+## Test it honestly (once, then stop guessing)
 
-Run these four and note which ones survive. Do it once, write the results in your vault, and stop
-guessing about it afterward.
-
-1. **Memory:** `What do you know about me?` — she should read the vault and answer.
-2. **File write:** `Create a note called Local Test in 05 - Reference and put today's date in it.`
+1. **Memory:** `What do you know about me?` She should read the vault and answer.
+2. **File write:** `Create a note called Local Test in 05 - Reference with today's date in it.`
 3. **Multi-step:** `Read my three most recent daily notes and list every open task in one place.`
 4. **Long haul:** something that takes six or seven tool calls.
 
-Most local setups pass 1 and 2, wobble on 3, and fail on 4. That's the honest shape of it, and it
-tells you exactly which tasks to keep in cloud mode.
+Most setups pass 1 and 2, wobble on 3, and struggle on 4. Write your results into the vault: that
+note tells you which tasks belong in Paid.
 
 ---
 
-## What actually gets worse
+## What gets worse, honestly
 
-Be realistic about this so you don't waste an afternoon thinking something's broken.
+- **Long tool chains drift.** The failure looks like looping or losing the goal, not an error.
+- **Slower as a session grows.** Every turn re-reads the conversation. Start fresh sessions often.
+  Auto-compaction is set to trigger at about 80% of the real context.
+- **Fixed knowledge, no web search.** She'll answer recent-events questions anyway, so don't trust those.
+- **Maths and precise reasoning degrade.** Have her show her work, and check it.
 
-- **Long tool chains drift.** The failure mode is looping or forgetting the goal, not erroring out.
-  This is the big one.
-- **No prompt caching.** Every turn reprocesses the whole conversation from scratch, so replies get
-  slower as a session gets longer. Start fresh sessions more often than you would on cloud.
-- **Knowledge of recent events is fixed** at whenever the model was trained, with no web access.
-- **Maths and precise reasoning degrade.** Have her show her work; check it.
-- **`tool_choice` is ignored** by the compatibility layer, so occasionally she'll pick the wrong tool
-  and get stuck. Ctrl+C and rephrase.
-
-**What holds up fine:** reading and writing vault notes, summarising, reformatting, generating quiz
-questions and flashcards, drafting from an outline, renaming and sorting files, explaining a concept,
-being asked the same question five ways.
-
----
+**What holds up:** reading and writing vault notes, summarising, reformatting, quiz questions and
+flashcards, drafting from an outline, sorting and renaming files, explaining a concept five ways.
 
 ## The realistic pattern
 
-Don't pick one mode. Use both.
-
-- **Cloud** for anything hard, long, research-shaped, or that you'll rely on: exam prep, a real draft,
-  planning a project, anything with more than about five steps.
-- **Local** for the offline hours, and for anything routine: capturing notes, quizzing yourself,
-  reformatting, filing, "what did I say I'd do today."
-
-The vault is shared, so work you do in one mode is available in the other. That's the whole reason
-the memory lives in files instead of inside the model.
+Use both. **Paid** for anything hard, long, research-shaped, or that you'll rely on. **Local** for
+offline hours and routine work. The vault is shared, which is the whole reason the memory lives in
+files instead of inside a model.
 
 ---
 
 ## For a classroom or an office
 
-If you're deploying this to a group, don't put a model on every machine — most student laptops can't
-run one well, and 30 people downloading 6.6 GB will end your network.
-
-Run **one Ollama host on the LAN** and point everyone at it:
-
-- On the host, set `OLLAMA_HOST` to `0.0.0.0:11434` in its user environment variables and restart
-  Ollama, so it accepts connections from the network rather than only from itself.
-- On each client, edit `scripts\evie-env.cmd` and change `ANTHROPIC_BASE_URL` in the `:local_brain`
-  section to `http://<host-ip>:11434`. One line, one file, and the Local shortcuts pick it up.
-- On the host, run `Set-OllamaTuning.ps1` but then raise `OLLAMA_NUM_PARALLEL` to match how many
-  students will be connected at once. **Each parallel slot gets its own context cache**, so a 24 GB
-  card running a 9B at 32K context serves a handful of simultaneous users, not forty. Budget
-  accordingly, or plan on students working in pairs.
-- Skip the tuning script on the client machines. They aren't running a model.
-- The host needs a real GPU. This is the one piece of hardware worth spending on.
-
-Everything else — vaults, guardrails, shortcuts — stays on each student's own machine. Their notes
-are theirs and never touch the server.
+One machine with a big GPU can serve the room. On the host, start llama-server with
+`--host 0.0.0.0` (edit the `--host` in `scripts\start-local-brain.cmd`) and raise `-np` to the number
+of simultaneous users. **Each parallel slot needs its own context memory,** so lower `-c` to match.
+On each client, set `EVIE_LLM_PORT` and change `127.0.0.1` in `scripts\evie-env.cmd` to the host's
+address, and skip `Install-LocalBrain.ps1` on the clients except step 7 (the sealed profile). Vaults
+stay on each person's own machine; only the model is shared.
