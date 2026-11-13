@@ -24,7 +24,11 @@ if errorlevel 1 (echo   The local brain did not start - see above. & pause & exi
 rem Same reason as the Paid launcher: backtalk reads its brain only from
 rem backtalk.json. The voice engine inherits this window's CLAUDE_CONFIG_DIR, so
 rem it also runs on the sealed local profile and never asks you to sign in.
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Set-BacktalkModel.ps1" -Model %EVIE_LLM_ALIAS% -DeepModel %EVIE_LLM_ALIAS% -AgentDir "%EVIE_HOME%"
+rem permission_mode bypassPermissions on Local, as in Chat (Local): in the voice
+rem test, "ask" mode turned one note into six spoken yes-prompts over 4 minutes,
+rem and "goodbye EVIE" was swallowed as an answer to a pending prompt. The
+rem guardrails and the delete-protection hook hold the line instead.
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Set-BacktalkModel.ps1" -Model %EVIE_LLM_ALIAS% -DeepModel %EVIE_LLM_ALIAS% -AgentDir "%EVIE_HOME%" -PermissionMode bypassPermissions
 if errorlevel 1 (echo   Could not update backtalk.json. & pause & exit /b 1)
 
 cd /d "%EVIE_BACKTALK%"

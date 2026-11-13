@@ -6,7 +6,8 @@
 param(
     [Parameter(Mandatory)] [string]$Model,
     [Parameter(Mandatory)] [string]$DeepModel,
-    [Parameter(Mandatory)] [string]$AgentDir
+    [Parameter(Mandatory)] [string]$AgentDir,
+    [string]$PermissionMode = ''
 )
 $ErrorActionPreference = 'Stop'
 $evieHome = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
@@ -16,7 +17,9 @@ if (-not (Test-Path $cfg)) {
     Copy-Item $example $cfg
 }
 $j = Get-Content $cfg -Raw -Encoding UTF8 | ConvertFrom-Json
-foreach ($pair in @(@('model', $Model), @('deep_model', $DeepModel), @('agent_dir', $AgentDir))) {
+$pairs = @(@('model', $Model), @('deep_model', $DeepModel), @('agent_dir', $AgentDir))
+if ($PermissionMode) { $pairs += ,@('permission_mode', $PermissionMode) }
+foreach ($pair in $pairs) {
     if ($j.PSObject.Properties.Name -contains $pair[0]) { $j.($pair[0]) = $pair[1] }
     else { $j | Add-Member -NotePropertyName $pair[0] -NotePropertyValue $pair[1] }
 }

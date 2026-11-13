@@ -88,8 +88,9 @@ Walk through these:
     If now: **which key should be push-to-talk?** Default `Home`. It should be a key they never press
     by accident and never need while typing.
 24. **Should I keep EVIE's default voice, or do you want to hear a couple of options?**
-    Default is Kokoro `af_heart` — warm, even, American English. Alternatives: `af_bella`,
-    `af_nicole`, `bf_emma` (British), `am_michael`, `bm_lewis`.
+    Default is a blend of Kokoro's `af_heart` and `af_bella` at speed 0.95: warm, natural,
+    American English. Alternatives: `af_bella`, `af_nicole`, `bf_emma` (British), `am_michael`, `bm_lewis`.
+    If they want to hear options, generate a short sample of each and play it.
 25. **How reliable is your internet, and do you want an offline brain too?**
     Explain in two lines: the offline brain is gpt-oss-20b running on this PC. It works with no
     internet and never needs the subscription or a sign-in, but it's slower and less capable than

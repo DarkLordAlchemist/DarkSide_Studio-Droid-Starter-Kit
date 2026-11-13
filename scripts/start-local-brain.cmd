@@ -33,7 +33,7 @@ tasklist /fi "imagename eq llama-server.exe" | find /i "llama-server.exe" >nul
 if not errorlevel 1 (
   echo   local brain: stopping another llama-server so gpt-oss fits in VRAM . . .
   taskkill /f /im llama-server.exe >nul 2>nul
-  "%SystemRoot%\System32\timeout.exe" /t 3 /nobreak >nul
+  ping -n 4 127.0.0.1 >nul
 )
 
 echo   local brain: loading gpt-oss-20b . . . the first load takes a minute or two.
@@ -56,7 +56,9 @@ if %N% GEQ 600 (
   echo   "EVIE local brain" window to read the real error.
   exit /b 1
 )
-"%SystemRoot%\System32\timeout.exe" /t 1 /nobreak >nul
+rem ping, not timeout: timeout fails instantly when there is no console
+rem ("Input redirection is not supported") and the loop would spin.
+ping -n 2 127.0.0.1 >nul
 goto :wait
 
 :health
